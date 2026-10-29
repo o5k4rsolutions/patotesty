@@ -16,7 +16,7 @@ button{font-family:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:10px}
 nav{position:sticky;top:0;z-index:20;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,48px);background:rgba(12,12,14,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
 nav img{height:26px;display:block}
-nav a.back{color:#c7c7cc;font-size:14px;font-weight:600;text-decoration:none}
+nav .btn{padding:12px 22px;font-size:15px}
 .bar{height:4px;background:rgba(0,0,0,.08)}
 .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .6s cubic-bezier(.16,1,.3,1)}
 main{max-width:1100px;margin:0 auto;padding:clamp(28px,6vh,64px) clamp(16px,4vw,32px) 80px}
@@ -95,7 +95,7 @@ main{position:relative;z-index:1}
 <body>
 <nav>
   <a href="/" aria-label="PatoTesty – strona główna"><img src="https://patotesty.pages.dev/themes/patotesty_horizontal_color.svg" alt="PatoTesty"></a>
-  <a class="back" href="/">Strona główna</a>
+  <a class="btn" href="/">Strona główna</a>
 </nav>
 <div class="bar"><i id="pb"></i></div>
 <main id="app"></main>
@@ -103,23 +103,23 @@ main{position:relative;z-index:1}
 <script>
 const V = "https://patotesty.pages.dev/web-content/wideo/";
 const L = "ABCD";
-/* Ile sekund ucinamy z końca każdego nagrania (watermarki). Zmień, jeśli trzeba więcej/mniej. */
-const TRIM = 2.5;
+/* Ile sekund ucinamy z końca każdego nagrania (0 = nic nie ucinamy). */
+const TRIM = 0;
 const STEPS = [
-  {k:"video", q:"Co Rafalala zrobiła na tym nagraniu?", src:V+"v0f044gc0000chp2bjjc77u26iqjbeog.mov", stop:4,
+  {k:"video", q:"Co Rafalala zrobiła na tym nagraniu?", src:V+"izabela-kisio-skorupa/copy_21C723E3-F01B-43AE-B7A6-271914C42A7F.mov", stop:4,
    o:["Rzuciła się na Izę","Oblała Izę kawą","Oblała Izę sokiem","Nic"], c:1},
-  {k:"video", q:"Co Iza odpowiedziała?", src:V+"v24044gl0000cvasedvog65pse7r3a7g.mov", stop:4,
+  {k:"video", q:"Co Iza odpowiedziała?", src:V+"izabela-kisio-skorupa/copy_BFA7C344-C597-4A5D-871E-88A0A0FC1920.mov", stop:4,
    o:["No witam","Jezu","Wypierdalaj","Żegnam"], c:0},
-  {k:"video", q:"Czym Iza wgl nie jest?", src:V+"v0f044gc0000ct45kqnog65jp2nbsou0.mov", stop:6,
+  {k:"video", q:"Czym Iza wgl nie jest?", src:V+"izabela-kisio-skorupa/copy_AB30A790-BFAD-4D04-8BE7-4B3E7160ADE6.mov", stop:6,
    o:["Lesbijką","Elgietebie","Gejem","Dziwką"], c:1},
   {k:"text", q:"Jakie relacje ma Iza ze swoją córką?",
    o:["Świetne","Okropne","Mierne","Nie ma córki"], c:1},
-  {k:"watch", q:"Jaka jest Iza?", hint:"Obejrzyj nagranie do końca i odpowiedz.", src:V+"v26044gc0000d6uih1fog65qkrsmpmeg.mov",
+  {k:"watch", q:"Jaka jest Iza?", hint:"Obejrzyj nagranie do końca i odpowiedz.", src:V+"izabela-kisio-skorupa/copy_21378BC2-88A3-4D69-A8FC-814D5E86C767.mov",
    o:["Normalna","Dwubiegunowa"], c:1},
   {k:"tf", q:"Oceń prawdziwość poniższych zdań.",
    items:[["Izabela pochodzi z Odessy",true],["Izabela uwielbia wpłaty 0,1 grosz",false],["Izabela nie pojechała na koncert Beyonce",false]]}
 ];
-const FINAL = V+"v26044gc0000dai7k1fog65pehun0cm0.mov";
+const FINAL = V+"izabela-kisio-skorupa/copy_1B4E40C3-90DB-44AA-A5A0-4C88D495682F.mov";
 const MAX = 5 + 3;
 const $ = id => document.getElementById(id);
 const app = $('app'), pb = $('pb');
