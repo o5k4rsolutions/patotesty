@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>404 – nie znaleziono strony | PatoTesty</title>
+<link rel="icon" type="image/svg+xml" href="https://patotesty.pages.dev/themes/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#ff2d55;--ink:#1d1d1f;--paper:#f5f5f7;--mute:#6e6e73;--font:'Inter Tight',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:var(--font);background:var(--paper);color:var(--ink);display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:8px}
+header{padding:0 clamp(16px,4vw,48px);height:56px;display:flex;align-items:center;background:#0c0c0e;position:relative;z-index:2}
+header img{height:26px;display:block}
+main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 20px 60px;position:relative}
+.orb{position:absolute;width:52vmax;height:52vmax;border-radius:50%;background:#ffc4cf;filter:blur(90px);opacity:.45;z-index:0;animation:drift 12s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(-12vw,-6vh)}to{transform:translate(12vw,8vh)}}
+.num{position:relative;z-index:1;font-size:clamp(120px,32vw,460px);font-weight:800;letter-spacing:-.06em;line-height:.85;display:flex}
+.num span{display:inline-block;transform:translateY(40%) scale(.8);opacity:0;animation:pop 1.1s cubic-bezier(.16,1,.3,1) forwards}
+.num span:nth-child(2){animation-delay:.12s;color:var(--accent)}
+.num span:nth-child(3){animation-delay:.24s}
+@keyframes pop{to{transform:none;opacity:1}}
+h1{position:relative;z-index:1;margin-top:28px;font-size:clamp(22px,3vw,34px);font-weight:600;letter-spacing:-.02em;opacity:0;animation:fade .9s .7s forwards}
+p{position:relative;z-index:1;margin:10px 0 34px;color:var(--mute);font-size:clamp(16px,1.8vw,20px);max-width:440px;line-height:1.4;font-weight:500;opacity:0;animation:fade .9s .85s forwards}
+.btn{position:relative;z-index:1;display:inline-flex;font:600 17px/1 var(--font);padding:16px 30px;border-radius:999px;background:var(--accent);color:#fff;text-decoration:none;opacity:0;animation:fade .9s 1s forwards;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.btn:hover{transform:scale(1.05);box-shadow:0 14px 40px -10px var(--accent)}
+@keyframes fade{to{opacity:1}}
+footer{padding:22px;text-align:center;font-size:14px;color:var(--mute);border-top:1px solid rgba(0,0,0,.08);background:#fff}
+footer strong{color:var(--ink);font-weight:600}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-delay:0s!important}}
+</style>
+</head>
+<body>
+<header><a href="/" aria-label="PatoTesty – strona główna"><img src="https://patotesty.pages.dev/themes/patotesty_horizontal_color.svg" alt="PatoTesty"></a></header>
+<main>
+  <div class="orb" aria-hidden="true"></div>
+  <div class="num" aria-hidden="true"><span>4</span><span>0</span><span>4</span></div>
+  <h1>Nie znaleziono strony</h1>
+  <p>Adres jest błędny albo strona została przeniesiona. Wróć na start i wybierz test.</p>
+  <a class="btn" href="/">Wróć na stronę główną</a>
+</main>
+<footer>Wykonanie: <strong>RAKSO Web Development</strong></footer>
+</body>
+</html>
