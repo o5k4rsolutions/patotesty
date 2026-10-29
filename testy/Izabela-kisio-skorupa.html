@@ -31,10 +31,23 @@ main{max-width:1100px;margin:0 auto;padding:clamp(28px,6vh,64px) clamp(16px,4vw,
 .intro p{margin:22px auto 36px;max-width:460px;font-size:clamp(18px,2vw,23px);color:var(--mute);font-weight:500;line-height:1.35}
 .split{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,5vw,64px);align-items:start}
 .solo{max-width:720px;margin:0 auto}
-.vid{position:relative;background:#000;border-radius:28px;overflow:hidden;aspect-ratio:9/16;max-height:72vh;margin:0 auto;width:100%}
-.vid video{width:100%;height:100%;object-fit:contain;display:block}
-.vid .play{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:30px;color:var(--ink)}
+
+/* własny odtwarzacz */
+.vid{position:relative;background:#000;border-radius:28px;overflow:hidden;aspect-ratio:9/16;max-height:72vh;margin:0 auto;width:100%;user-select:none;-webkit-user-select:none}
+.vid video{width:100%;height:100%;object-fit:contain;display:block;cursor:pointer}
+.vid .play{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:var(--ink);display:grid;place-items:center;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.vid .play:hover{transform:scale(1.08)}
+.vid .play svg{width:36px;height:36px}
 .vid .play[hidden]{display:none}
+.ctl{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;padding:30px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.ctl button{flex:none;width:38px;height:38px;border:0;border-radius:50%;background:transparent;color:#fff;display:grid;place-items:center;transition:background .2s}
+.ctl button:hover{background:rgba(255,255,255,.2)}
+.ctl button svg{width:20px;height:20px}
+.ctl span{flex:none;color:#fff;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.trk{flex:1;height:26px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.trk b{display:block;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
+.trk i{display:block;height:100%;width:0;background:var(--accent)}
+
 .qbox h2{font-size:clamp(28px,3.6vw,46px);font-weight:800;letter-spacing:-.035em;line-height:1.05;margin-bottom:12px}
 .hint{color:var(--mute);font-size:16px;font-weight:500;margin-bottom:22px;min-height:22px}
 .opts{display:grid;gap:12px;transition:opacity .4s}
@@ -82,6 +95,8 @@ main{max-width:1100px;margin:0 auto;padding:clamp(28px,6vh,64px) clamp(16px,4vw,
 <script>
 const V = "https://patotesty.pages.dev/web-content/wideo/";
 const L = "ABCD";
+/* Ile sekund ucinamy z końca każdego nagrania (watermarki). Zmień, jeśli trzeba więcej/mniej. */
+const TRIM = 5.5;
 const STEPS = [
   {k:"video", q:"Co Rafalala zrobiła na tym nagraniu?", src:V+"v0f044gc0000chp2bjjc77u26iqjbeog.mov", stop:4,
    o:["Rzuciła się na Izę","Oblała Izę kawą","Oblała Izę sokiem","Nic"], c:1},
@@ -98,7 +113,8 @@ const STEPS = [
   {k:"final", src:V+"v26044gc0000dai7k1fog65pehun0cm0.mov"}
 ];
 const MAX = 5 + 3;
-const app = document.getElementById('app'), pb = document.getElementById('pb');
+const $ = id => document.getElementById(id);
+const app = $('app'), pb = $('pb');
 let i = -1, score = 0, log = [], raf = 0;
 
 const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -113,12 +129,91 @@ function intro(){
   scene(`<div class="intro"><h1>Izabela<br>Kisio-Skorupa</h1>
   <p>Test o Mamie Kisio. Włącz dźwięk – będą nagrania.</p>
   <button class="btn" id="go">Zacznij test</button></div>`);
-  document.getElementById('go').onclick = () => { i = 0; step(); };
+  $('go').onclick = () => { i = 0; step(); };
 }
 
-function playSafe(v, pl){ const p = v.play(); if(p && p.catch) p.catch(()=>{ pl.hidden = false; }); }
-function vidHtml(src){ return `<div class="vid"><video id="v" src="${src}" playsinline preload="auto"></video><button class="play" id="pl" hidden aria-label="Odtwórz">&#9654;</button></div>`; }
+/* ---------- własny odtwarzacz ---------- */
+const svg = d => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  play:   svg('<path d="M8 5v14l11-7z"/>'),
+  pause:  svg('<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'),
+  replay: svg('<path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/>'),
+  vol:    svg('<path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/>'),
+  mute:   svg('<path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9l5 6m0-6l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>')
+};
+const fmt = t => { t = Math.max(0, t|0); return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0'); };
 
+function vidHtml(src){
+  return `<div class="vid"><video id="v" src="${src}" playsinline preload="auto"></video>
+  <button class="play" id="pl" aria-label="Odtwórz" hidden></button>
+  <div class="ctl">
+    <button id="pp" aria-label="Odtwórz / pauza"></button>
+    <div class="trk" id="trk"><b><i id="fill"></i></b></div>
+    <span id="tm">0:00 / 0:00</span>
+    <button id="mu" aria-label="Dźwięk"></button>
+  </div></div>`;
+}
+
+/* p.limit  – do której sekundy wolno oglądać (null = do końca po ucięciu)
+   p.onReach – wywoływane, gdy odtwarzanie dojdzie do limitu / końca */
+function bindPlayer(){
+  const v = $('v'), big = $('pl'), pp = $('pp'), fill = $('fill'), tm = $('tm'), mu = $('mu'), trk = $('trk');
+  const p = {v, limit:null, reached:false, onReach(){}};
+  const end = () => isFinite(v.duration) ? Math.max(.1, v.duration - TRIM) : Infinity;
+  const lim = () => Math.min(p.limit == null ? Infinity : p.limit, end());
+  const atLimit = () => v.currentTime >= lim() - .05;
+  const atEnd = () => v.currentTime >= end() - .05;
+  const reach = () => { if(!p.reached){ p.reached = true; p.onReach(); } };
+
+  function ui(){
+    const e = end(), t = Math.min(v.currentTime, isFinite(e) ? e : v.currentTime);
+    fill.style.width = (isFinite(e) ? Math.min(100, t / e * 100) : 0) + '%';
+    tm.textContent = fmt(t) + ' / ' + (isFinite(e) ? fmt(e) : '0:00');
+    const ended = isFinite(e) && atEnd();
+    const icon = v.paused ? (ended ? ICON.replay : ICON.play) : ICON.pause;
+    if(pp.dataset.i !== icon){ pp.dataset.i = icon; pp.innerHTML = icon; }
+    const bi = ended ? ICON.replay : ICON.play;
+    if(big.dataset.i !== bi){ big.dataset.i = bi; big.innerHTML = bi; }
+    big.hidden = !v.paused || (atLimit() && !ended);
+  }
+  function loop(){
+    if(v.currentTime > lim() && isFinite(lim())) v.currentTime = lim();
+    if(atLimit() && isFinite(lim())){ if(!v.paused) v.pause(); reach(); }
+    ui();
+    raf = requestAnimationFrame(loop);
+  }
+  function play(){ const r = v.play(); if(r && r.catch) r.catch(()=>{}); }
+  function toggle(){
+    if(!v.paused){ v.pause(); return; }
+    if(atLimit()){ v.currentTime = 0; p.reached = false; }
+    play();
+  }
+  let drag = false;
+  function seek(e){
+    const r = trk.getBoundingClientRect(), e2 = end();
+    if(!isFinite(e2)) return;
+    const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    const t = Math.min(f * e2, lim());
+    v.currentTime = t;
+    if(t < lim() - .05) p.reached = false;
+  }
+  trk.onpointerdown = e => { drag = true; trk.setPointerCapture(e.pointerId); seek(e); };
+  trk.onpointermove = e => { if(drag) seek(e); };
+  trk.onpointerup = trk.onpointercancel = () => { drag = false; };
+
+  v.onclick = big.onclick = pp.onclick = toggle;
+  mu.innerHTML = ICON.vol;
+  mu.onclick = () => { v.muted = !v.muted; mu.innerHTML = v.muted ? ICON.mute : ICON.vol; };
+  v.addEventListener('ended', reach);
+  v.addEventListener('error', reach);
+
+  p.play = play;
+  p.resume = () => { p.limit = null; p.reached = false; p.onReach = () => {}; play(); };
+  raf = requestAnimationFrame(loop);
+  return p;
+}
+
+/* ---------- kroki ---------- */
 function step(){
   const s = STEPS[i];
   if(s.k==='video') return videoQ(s);
@@ -128,53 +223,45 @@ function step(){
   return finalV(s);
 }
 
-function answer(s, n, box, v){
+function answer(s, n, box, p){
   const ok = n === s.c;
   if(ok) score++;
   log.push({q:s.q, chosen:s.o[n], right:s.o[s.c], ok});
   box.querySelectorAll('.opt').forEach((b,x)=>{ b.classList.add('done'); if(x===s.c) b.classList.add('ok'); else if(x===n) b.classList.add('no'); });
-  const fb = document.getElementById('fb');
+  const fb = $('fb');
   fb.className = 'fb ' + (ok?'ok':'no');
   fb.textContent = ok ? 'Dobrze!' : 'Poprawna odpowiedź: ' + s.o[s.c];
-  document.getElementById('nxw').innerHTML = nextBtn();
-  document.getElementById('nx').onclick = () => { i++; step(); };
-  if(v){ v.controls = true; v.currentTime = 0; v.play().catch(()=>{}); }
+  $('nxw').innerHTML = nextBtn();
+  $('nx').onclick = () => { i++; step(); };
+  if(p) p.resume();   /* dalsza część nagrania, bez startu od zera */
 }
 
 function videoQ(s){
   scene(`<div class="split">${vidHtml(s.src)}<div class="qbox"><h2>${esc(s.q)}</h2>
-    <p class="hint" id="hint">Oglądaj – nagranie zatrzyma się na ${s.stop}. sekundzie.</p>
+    <p class="hint"></p>
     ${optsHtml(s.o,true)}<div class="fb" id="fb"></div><div id="nxw"></div></div></div>`);
-  const v = document.getElementById('v'), pl = document.getElementById('pl'), box = document.getElementById('opts');
-  pl.onclick = () => { pl.hidden = true; v.play(); };
-  let held = false;
-  const unlock = () => { if(held) return; held = true; v.pause(); cancelAnimationFrame(raf);
-    document.getElementById('hint').textContent = 'Wybierz odpowiedź. Potem puścimy całe nagranie.';
-    box.classList.remove('locked'); };
-  const loop = () => { if(v.currentTime >= s.stop) unlock(); else raf = requestAnimationFrame(loop); };
-  v.addEventListener('playing', () => { pl.hidden = true; if(!held){ cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); } });
-  v.addEventListener('error', unlock);
-  playSafe(v, pl);
-  box.onclick = e => { const b = e.target.closest('.opt'); if(b) answer(s, +b.dataset.n, box, v); };
+  const box = $('opts');
+  const p = bindPlayer();
+  p.limit = s.stop;
+  p.onReach = () => box.classList.remove('locked');
+  p.play();
+  box.onclick = e => { const b = e.target.closest('.opt'); if(b) answer(s, +b.dataset.n, box, p); };
 }
 
 function textQ(s){
   scene(`<div class="solo qbox"><h2>${esc(s.q)}</h2><p class="hint">Wybierz odpowiedź.</p>${optsHtml(s.o)}<div class="fb" id="fb"></div><div id="nxw"></div></div>`);
-  const box = document.getElementById('opts');
+  const box = $('opts');
   box.onclick = e => { const b = e.target.closest('.opt'); if(b) answer(s, +b.dataset.n, box, null); };
 }
 
 function watchQ(s){
   scene(`<div class="split">${vidHtml(s.src)}<div class="qbox"><h2>${esc(s.q)}</h2>
     <p class="hint" id="hint">${esc(s.hint)}</p>${optsHtml(s.o,true)}<div class="fb" id="fb"></div><div id="nxw"></div></div></div>`);
-  const v = document.getElementById('v'), pl = document.getElementById('pl'), box = document.getElementById('opts');
-  v.controls = true;
-  pl.onclick = () => { pl.hidden = true; v.play(); };
-  const unlock = () => { box.classList.remove('locked'); document.getElementById('hint').textContent = 'Wybierz odpowiedź.'; };
-  v.addEventListener('ended', unlock); v.addEventListener('error', unlock);
-  v.addEventListener('playing', () => pl.hidden = true);
-  playSafe(v, pl);
-  box.onclick = e => { const b = e.target.closest('.opt'); if(b){ v.pause(); answer(s, +b.dataset.n, box, null); } };
+  const box = $('opts');
+  const p = bindPlayer();
+  p.onReach = () => { box.classList.remove('locked'); $('hint').textContent = 'Wybierz odpowiedź.'; };
+  p.play();
+  box.onclick = e => { const b = e.target.closest('.opt'); if(b){ p.v.pause(); answer(s, +b.dataset.n, box, null); } };
 }
 
 function tfQ(s){
@@ -192,20 +279,17 @@ function tfQ(s){
       log.push({q:'Oceń prawdziwość: ' + it[0], chosen: said?'Prawda':'Fałsz', right: it[1]?'Prawda':'Fałsz', ok});
       row.querySelectorAll('.opt').forEach(x => { x.classList.add('done'); if((x.dataset.a==='1') === it[1]) x.classList.add('ok'); else if(x===b) x.classList.add('no'); });
       const r = row.querySelector('.res'); r.className = 'res ' + (ok?'ok':'no'); r.textContent = ok ? 'Dobrze!' : 'Poprawnie: ' + (it[1]?'Prawda':'Fałsz');
-      if(--left === 0){ document.getElementById('nxw').innerHTML = nextBtn('Obejrzyj finał'); document.getElementById('nx').onclick = () => { i++; step(); }; }
+      if(--left === 0){ $('nxw').innerHTML = nextBtn('Obejrzyj finał'); $('nx').onclick = () => { i++; step(); }; }
     };
   });
 }
 
 function finalV(s){
   scene(`<div class="solo qbox" style="text-align:center"><h2>Na koniec: całe nagranie</h2><p class="hint" id="hint">Obejrzyj do końca, a pokażemy wyniki.</p>${vidHtml(s.src)}<div id="nxw" style="margin-top:20px"><button class="btn" id="nx" disabled>Pokaż wyniki</button></div></div>`);
-  const v = document.getElementById('v'), pl = document.getElementById('pl'), nx = document.getElementById('nx');
-  v.controls = true;
-  pl.onclick = () => { pl.hidden = true; v.play(); };
-  const done = () => { nx.disabled = false; };
-  v.addEventListener('ended', done); v.addEventListener('error', done);
-  v.addEventListener('playing', () => pl.hidden = true);
-  playSafe(v, pl);
+  const nx = $('nx');
+  const p = bindPlayer();
+  p.onReach = () => { nx.disabled = false; };
+  p.play();
   nx.onclick = () => { i++; results(); };
 }
 
@@ -216,11 +300,11 @@ function results(){
   scene(`<div class="result"><small>Twój wynik</small><div class="score"><span id="sc">0</span>/${MAX}</div><p class="msg">${msg}</p>
     <div class="acts"><button class="btn" id="rv">Sprawdź swoje odpowiedzi</button><button class="btn ghost" id="again">Zagraj jeszcze raz</button><a class="btn ghost" href="/">Strona główna</a></div>
     <div class="review" id="review" hidden></div></div>`);
-  const sc = document.getElementById('sc'); let n = 0;
+  const sc = $('sc'); let n = 0;
   const t = setInterval(() => { sc.textContent = n; if(n++ >= score) clearInterval(t); }, 180);
-  document.getElementById('again').onclick = intro;
-  document.getElementById('rv').onclick = () => {
-    const r = document.getElementById('review');
+  $('again').onclick = intro;
+  $('rv').onclick = () => {
+    const r = $('review');
     r.innerHTML = log.map((l,x) => `<div class="rv" style="animation-delay:${x*60}ms"><h3>${esc(l.q)}</h3>
       <div class="${l.ok?'g':'r'}">Twoja odpowiedź: ${esc(l.chosen)}</div>${l.ok?'':`<div class="m">Poprawna: ${esc(l.right)}</div>`}</div>`).join('');
     r.hidden = false; r.scrollIntoView({behavior:'smooth', block:'start'});
