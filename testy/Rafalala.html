@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test: Rafalala (Rita) | PatoTesty</title>
+<link rel="icon" type="image/svg+xml" href="https://patotesty.pages.dev/themes/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--accent:#ff2d55;--ink:#1d1d1f;--paper:#f5f5f7;--mute:#6e6e73;--ok:#1f9d55;--bad:#d92d20;--font:'Inter Tight',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:var(--font);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:10px}
+nav{position:sticky;top:0;z-index:20;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,48px);background:rgba(12,12,14,.82);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px)}
+nav img{height:26px;display:block}
+nav .btn{padding:12px 22px;font-size:15px}
+.bar{height:4px;background:rgba(0,0,0,.08)}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .6s cubic-bezier(.16,1,.3,1)}
+main{max-width:1100px;margin:0 auto;padding:clamp(28px,6vh,64px) clamp(16px,4vw,32px) 80px}
+.scene{animation:in .7s cubic-bezier(.16,1,.3,1)}
+@keyframes in{from{opacity:0;transform:translateY(36px) scale(.98)}to{opacity:1;transform:none}}
+.btn{display:inline-flex;align-items:center;justify-content:center;font:600 17px/1 var(--font);padding:16px 30px;border-radius:999px;background:var(--accent);color:#fff;border:0;text-decoration:none;transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s,opacity .2s}
+.btn:hover{transform:scale(1.05);box-shadow:0 14px 40px -10px var(--accent)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.intro{text-align:center;padding:6vh 0}
+.intro h1{font-size:clamp(44px,9vw,120px);font-weight:800;letter-spacing:-.045em;line-height:.95}
+.intro p{margin:22px auto 36px;max-width:460px;font-size:clamp(18px,2vw,23px);color:var(--mute);font-weight:500;line-height:1.35}
+.split{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(24px,5vw,64px);align-items:start}
+.solo{max-width:720px;margin:0 auto}
+.vid{position:relative;background:#000;border-radius:28px;overflow:hidden;aspect-ratio:9/16;max-height:72vh;margin:0 auto;width:100%;user-select:none;-webkit-user-select:none}
+.vid video{width:100%;height:100%;object-fit:contain;display:block;cursor:pointer}
+.vid .play{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,255,255,.9);color:var(--ink);display:grid;place-items:center;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.vid .play:hover{transform:scale(1.08)}
+.vid .play svg{width:36px;height:36px}
+.vid .play[hidden]{display:none}
+.ctl{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:8px;padding:30px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.7))}
+.ctl button{flex:none;width:38px;height:38px;border:0;border-radius:50%;background:transparent;color:#fff;display:grid;place-items:center;transition:background .2s}
+.ctl button:hover{background:rgba(255,255,255,.2)}
+.ctl button svg{width:20px;height:20px}
+.ctl span{flex:none;color:#fff;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.trk{flex:1;height:26px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.trk b{display:block;width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
+.trk i{display:block;height:100%;width:0;background:var(--accent)}
+.qbox h2{font-size:clamp(28px,3.6vw,46px);font-weight:800;letter-spacing:-.035em;line-height:1.05;margin-bottom:12px}
+.hint{color:var(--mute);font-size:16px;font-weight:500;margin-bottom:22px;min-height:22px}
+.opts{display:grid;gap:12px;transition:opacity .4s}
+.opts.locked{opacity:.3;pointer-events:none}
+.opt{display:flex;gap:14px;align-items:center;text-align:left;width:100%;padding:18px 20px;font-size:19px;font-weight:600;color:var(--ink);background:#fff;border:0;border-radius:18px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s,background .3s}
+.opt b{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--paper);font-size:15px}
+.opt:hover{transform:translateX(6px) scale(1.01);box-shadow:inset 0 0 0 2px var(--ink)}
+.opt.ok{background:var(--ok);color:#fff;box-shadow:none}.opt.ok b{background:rgba(255,255,255,.25)}
+.opt.no{background:var(--bad);color:#fff;box-shadow:none;animation:shake .4s}.opt.no b{background:rgba(255,255,255,.25)}
+.opt.done{pointer-events:none}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.fb{margin:22px 0 4px;font-size:19px;font-weight:700;min-height:28px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.next{margin-top:18px}
+.tf{display:grid;gap:14px;margin-top:6px}
+.tfr{background:#fff;border-radius:20px;padding:18px 20px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.tfr p{font-size:19px;font-weight:600;margin-bottom:14px;line-height:1.3}
+.tfr .pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tfr .opt{justify-content:center;padding:14px}
+.tfr .res{margin-top:10px;font-size:15px;font-weight:700;min-height:20px}
+.res.ok{color:var(--ok)}.res.no{color:var(--bad)}
+.result{text-align:center;padding:4vh 0}
+.result small{font-size:clamp(20px,2.4vw,28px);color:var(--mute);font-weight:600}
+.score{font-size:clamp(100px,24vw,300px);font-weight:800;letter-spacing:-.06em;line-height:.9;margin:8px 0 10px}
+.score span{color:var(--accent)}
+.result p.msg{font-size:clamp(18px,2vw,24px);font-weight:600;margin-bottom:30px}
+.acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.review{margin:40px auto 0;max-width:720px;text-align:left;display:grid;gap:12px}
+.rv{background:#fff;border-radius:18px;padding:16px 20px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);animation:in .6s both}
+.rv h3{font-size:17px;font-weight:700;margin-bottom:8px;line-height:1.25}
+.rv div{font-size:15px;font-weight:600;line-height:1.5}
+.rv .g{color:var(--ok)}.rv .r{color:var(--bad)}.rv .m{color:var(--mute)}
+@media(max-width:820px){.split{grid-template-columns:1fr}.vid{max-height:58vh;aspect-ratio:9/14}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" aria-label="PatoTesty – strona główna"><img src="https://patotesty.pages.dev/themes/patotesty_horizontal_color.svg" alt="PatoTesty"></a>
+  <a class="btn" href="/">Strona główna</a>
+</nav>
+<div class="bar"><i id="pb"></i></div>
+<main id="app"></main>
+
+<script>
+const V = "https://patotesty.pages.dev/web-content/wideo/";
+const R = V + "Rafalala/";
+const L = "ABCD";
+/* k:"watch" = puść cały film, odpowiedź dopiero po końcu
+   k:"video" = film zatrzymuje się na sekundzie `stop`, po odpowiedzi leci dalej
+   k:"end"   = nagranie końcowe, potem wyniki */
+const STEPS = [
+  {k:"watch", q:"Co Rita chciała na tym nagraniu od kasjerki?", hint:"Obejrzyj nagranie do końca i odpowiedz.", src:R+"copy_848328E5-C095-4332-9106-FDF809820CD2.mov",
+   o:["Aby otworzyć kasę, bo jest celebrytką","Aby otworzyć kasę, bo tak","Aby nie płacić za zakupy, bo jest celebrytką","Nic"], c:0},
+  {k:"video", q:"Co ta Pani miała na włosach?", src:R+"copy_E903C9DA-267B-4521-A7FC-A22BB8F51D67.mov", stop:10,
+   o:["Mrówkę","Robaka","Paproch"], c:0},
+  {k:"watch", q:"Podaj poprawną nazwę bitwy pomiędzy Rafalalą a Tajemniczą Moniką.", hint:"Obejrzyj nagranie do końca i odpowiedz.", src:R+"copy_4BD1FF83-B6E3-47FD-AAA5-8566503D614B.mov",
+   o:["Bitwa pod Choinkami","Bitwa pod Grunwaldem","Bitwa pod Biedronką","Bitwa o Kasę"], c:0},
+  {k:"video", q:"Kto dzwonił do Rity?", src:R+"copy_5B86CD91-4259-4A56-8C9C-1CCE31EB089F.mov", stop:5,
+   o:["Monika from Kraków","Monika from Warsaw","Valentina from Kraków"], c:0},
+  {k:"watch", q:"Kogo Rafalala oblała na tym nagraniu?", hint:"Obejrzyj nagranie do końca i odpowiedz.", src:V+"izabela-kisio-skorupa/copy_21C723E3-F01B-43AE-B7A6-271914C42A7F.mov",
+   o:["Tajemniczą Monikę","Izabelę Kisio-Skorupę","Cukrową Ankę","Magdę Kłosowską"], c:1},
+  {k:"video", q:"Jak Rafalala ma na imię według tego nagrania?", src:R+"copy_49DC87C0-D921-4E7F-9A6C-2D1434BDD850.mov", stop:5,
+   o:["Edyta","Rita","Beata","Monika"], c:0},
+  {k:"tf", q:"Oceń prawdziwość poniższych zdań.",
+   items:[["Rafalala ma 44 lata",true],["Rafalala urodziła się w Bydgoszczy",false]]},
+  {k:"watch", q:"Czy będzie Wojna?", hint:"Obejrzyj nagranie do końca i odpowiedz.", src:R+"copy_7B77D28F-6DB0-415D-B5CD-EBF8680F0B73.mov",
+   o:["Nie, ten żołnierz obroni Ritę","Tak"], c:0},
+  {k:"end", src:R+"copy_17849B26-3A8C-476E-B20B-A13381E1D00E.mov"}
+];
+const MAX = 9;
+const $ = id => document.getElementById(id);
+const app = $('app'), pb = $('pb');
+let i = -1, score = 0, log = [], raf = 0;
+
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const optsHtml = (o, locked) => `<div class="opts ${locked?'locked':''}" id="opts">` +
+  o.map((t,n)=>`<button class="opt" data-n="${n}"><b>${L[n]}</b>${esc(t)}</button>`).join('') + `</div>`;
+const scene = html => { cancelAnimationFrame(raf); app.innerHTML = `<div class="scene">${html}</div>`; scrollTo({top:0,behavior:'smooth'}); pb.style.width = Math.max(0,i) / STEPS.length * 100 + '%'; };
+const nextBtn = (label='Dalej') => `<button class="btn next" id="nx">${label}</button>`;
+
+function intro(){
+  i = -1; score = 0; log = [];
+  pb.style.width = '0';
+  scene(`<div class="intro"><h1>Rafalala<br>(Rita)</h1>
+  <p>Test o Ricie. Włącz dźwięk – będą nagrania.</p>
+  <button class="btn" id="go">Zacznij test</button></div>`);
+  $('go').onclick = () => { i = 0; step(); };
+}
+
+const svg = d => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  play:   svg('<path d="M8 5v14l11-7z"/>'),
+  pause:  svg('<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'),
+  replay: svg('<path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/>'),
+  vol:    svg('<path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/>'),
+  mute:   svg('<path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M16 9l5 6m0-6l-5 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>')
+};
+const fmt = t => { t = Math.max(0, t|0); return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0'); };
+
+function vidHtml(src){
+  return `<div class="vid"><video id="v" src="${src}" playsinline preload="auto"></video>
+  <button class="play" id="pl" aria-label="Odtwórz" hidden></button>
+  <div class="ctl">
+    <button id="pp" aria-label="Odtwórz / pauza"></button>
+    <div class="trk" id="trk"><b><i id="fill"></i></b></div>
+    <span id="tm">0:00 / 0:00</span>
+    <button id="mu" aria-label="Dźwięk"></button>
+  </div></div>`;
+}
+
+function bindPlayer(){
+  const v = $('v'), big = $('pl'), pp = $('pp'), fill = $('fill'), tm = $('tm'), mu = $('mu'), trk = $('trk');
+  const p = {v, limit:null, reached:false, onReach(){}};
+  const end = () => isFinite(v.duration) ? Math.max(.1, v.duration) : Infinity;
+  const lim = () => Math.min(p.limit == null ? Infinity : p.limit, end());
+  const atLimit = () => v.currentTime >= lim() - .05;
+  const atEnd = () => v.currentTime >= end() - .05;
+  const reach = () => { if(!p.reached){ p.reached = true; p.onReach(); } };
+
+  function ui(){
+    const e = end(), t = Math.min(v.currentTime, isFinite(e) ? e : v.currentTime);
+    fill.style.width = (isFinite(e) ? Math.min(100, t / e * 100) : 0) + '%';
+    tm.textContent = fmt(t) + ' / ' + (isFinite(e) ? fmt(e) : '0:00');
+    const ended = isFinite(e) && atEnd();
+    const icon = v.paused ? (ended ? ICON.replay : ICON.play) : ICON.pause;
+    if(pp.dataset.i !== icon){ pp.dataset.i = icon; pp.innerHTML = icon; }
+    const bi = ended ? ICON.replay : ICON.play;
+    if(big.dataset.i !== bi){ big.dataset.i = bi; big.innerHTML = bi; }
+    big.hidden = !v.paused || (atLimit() && !ended);
+  }
+  function loop(){
+    if(v.currentTime > lim() && isFinite(lim())) v.currentTime = lim();
+    if(p.limit != null && atLimit() && isFinite(lim())){ if(!v.paused) v.pause(); reach(); }
+    ui();
+    raf = requestAnimationFrame(loop);
+  }
+  function play(){ const r = v.play(); if(r && r.catch) r.catch(()=>{}); }
+  function toggle(){
+    if(!v.paused){ v.pause(); return; }
+    if(atLimit() && p.limit != null){ v.currentTime = 0; p.reached = false; }
+    else if(atEnd()){ v.currentTime = 0; }
+    play();
+  }
+  let drag = false;
+  function seek(e){
+    const r = trk.getBoundingClientRect(), e2 = end();
+    if(!isFinite(e2)) return;
+    const f = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+    const t = Math.min(f * e2, lim());
+    v.currentTime = t;
+    if(p.limit != null && t < lim() - .05) p.reached = false;
+  }
+  trk.onpointerdown = e => { drag = true; trk.setPointerCapture(e.pointerId); seek(e); };
+  trk.onpointermove = e => { if(drag) seek(e); };
+  trk.onpointerup = trk.onpointercancel = () => { drag = false; };
+
+  v.onclick = big.onclick = pp.onclick = toggle;
+  mu.innerHTML = ICON.vol;
+  mu.onclick = () => { v.muted = !v.muted; mu.innerHTML = v.muted ? ICON.mute : ICON.vol; };
+  v.addEventListener('ended', reach);
+  v.addEventListener('error', reach);
+
+  p.play = play;
+  p.resume = () => { p.limit = null; p.reached = false; p.onReach = () => {}; play(); };
+  raf = requestAnimationFrame(loop);
+  return p;
+}
+
+function step(){
+  const s = STEPS[i];
+  if(s.k==='video') return videoQ(s);
+  if(s.k==='watch') return watchQ(s);
+  if(s.k==='tf') return tfQ(s);
+  return endQ(s);
+}
+
+function answer(s, n, box, p){
+  const ok = n === s.c;
+  if(ok) score++;
+  log.push({q:s.q, chosen:s.o[n], right:s.o[s.c], ok});
+  box.querySelectorAll('.opt').forEach((b,x)=>{ b.classList.add('done'); if(x===s.c) b.classList.add('ok'); else if(x===n) b.classList.add('no'); });
+  const fb = $('fb');
+  fb.className = 'fb ' + (ok?'ok':'no');
+  fb.textContent = ok ? 'Dobrze!' : 'Poprawna odpowiedź: ' + s.o[s.c];
+  $('nxw').innerHTML = nextBtn();
+  $('nx').onclick = () => { i++; step(); };
+  if(p) p.resume();
+}
+
+function videoQ(s){
+  scene(`<div class="split">${vidHtml(s.src)}<div class="qbox"><h2>${esc(s.q)}</h2>
+    <p class="hint"></p>
+    ${optsHtml(s.o,true)}<div class="fb" id="fb"></div><div id="nxw"></div></div></div>`);
+  const box = $('opts');
+  const p = bindPlayer();
+  p.limit = s.stop;
+  p.onReach = () => box.classList.remove('locked');
+  p.play();
+  box.onclick = e => { const b = e.target.closest('.opt'); if(b) answer(s, +b.dataset.n, box, p); };
+}
+
+function watchQ(s){
+  scene(`<div class="split">${vidHtml(s.src)}<div class="qbox"><h2>${esc(s.q)}</h2>
+    <p class="hint" id="hint">${esc(s.hint)}</p>${optsHtml(s.o,true)}<div class="fb" id="fb"></div><div id="nxw"></div></div></div>`);
+  const box = $('opts');
+  const p = bindPlayer();
+  p.onReach = () => { box.classList.remove('locked'); $('hint').textContent = 'Wybierz odpowiedź.'; };
+  p.play();
+  box.onclick = e => { const b = e.target.closest('.opt'); if(b){ p.v.pause(); answer(s, +b.dataset.n, box, null); } };
+}
+
+function tfQ(s){
+  scene(`<div class="solo qbox"><h2>${esc(s.q)}</h2><p class="hint">Prawda czy fałsz?</p><div class="tf">` +
+    s.items.map((it,n)=>`<div class="tfr" data-n="${n}"><p>${String.fromCharCode(65+n)}. ${esc(it[0])}</p>
+      <div class="pair"><button class="opt" data-a="1">Prawda</button><button class="opt" data-a="0">Fałsz</button></div><div class="res"></div></div>`).join('') +
+    `</div><div id="nxw"></div></div>`);
+  let left = s.items.length;
+  app.querySelectorAll('.tfr').forEach(row => {
+    row.onclick = e => {
+      const b = e.target.closest('.opt'); if(!b || row.dataset.d) return;
+      row.dataset.d = 1;
+      const it = s.items[+row.dataset.n], said = b.dataset.a === '1', ok = said === it[1];
+      if(ok) score++;
+      log.push({q:'Oceń prawdziwość: ' + it[0], chosen: said?'Prawda':'Fałsz', right: it[1]?'Prawda':'Fałsz', ok});
+      row.querySelectorAll('.opt').forEach(x => { x.classList.add('done'); if((x.dataset.a==='1') === it[1]) x.classList.add('ok'); else if(x===b) x.classList.add('no'); });
+      const r = row.querySelector('.res'); r.className = 'res ' + (ok?'ok':'no'); r.textContent = ok ? 'Dobrze!' : 'Poprawnie: ' + (it[1]?'Prawda':'Fałsz');
+      if(--left === 0){ $('nxw').innerHTML = nextBtn(); $('nx').onclick = () => { i++; step(); }; }
+    };
+  });
+}
+
+function endQ(s){
+  scene(`<div class="split">${vidHtml(s.src)}<div class="qbox"><h2>Na koniec</h2>
+    <p class="hint" id="hint">Obejrzyj nagranie do końca.</p>
+    <button class="btn next" id="nx" disabled>Pokaż wyniki</button></div></div>`);
+  const p = bindPlayer();
+  p.onReach = () => { $('hint').textContent = 'Gotowe – zobacz swój wynik.'; $('nx').disabled = false; };
+  p.play();
+  $('nx').onclick = () => { p.v.pause(); i++; results(); };
+}
+
+function results(){
+  pb.style.width = '100%';
+  const pct = score / MAX;
+  const msg = pct === 1 ? 'Komplet. Znasz Ritę na wylot.' : pct >= .6 ? 'Całkiem nieźle. Widać, że śledzisz temat.' : 'Do powtórki. Oglądaj uważniej.';
+  scene(`<div class="result"><small>Twój wynik</small><div class="score"><span id="sc">0</span>/${MAX}</div><p class="msg">${msg}</p>
+    <div class="acts"><button class="btn" id="rv">Sprawdź swoje odpowiedzi</button><button class="btn ghost" id="again">Zagraj jeszcze raz</button><a class="btn ghost" href="/">Strona główna</a></div>
+    <div class="review" id="review" hidden></div></div>`);
+  const sc = $('sc'); let n = 0;
+  const t = setInterval(() => { sc.textContent = n; if(n++ >= score) clearInterval(t); }, 180);
+  $('again').onclick = intro;
+  $('rv').onclick = () => {
+    const r = $('review');
+    r.innerHTML = log.map((l,x) => `<div class="rv" style="animation-delay:${x*60}ms"><h3>${esc(l.q)}</h3>
+      <div class="${l.ok?'g':'r'}">Twoja odpowiedź: ${esc(l.chosen)}</div>${l.ok?'':`<div class="m">Poprawna: ${esc(l.right)}</div>`}</div>`).join('');
+    r.hidden = false; r.scrollIntoView({behavior:'smooth', block:'start'});
+  };
+}
+
+intro();
+</script>
+</body>
+</html>
